@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MVVM</title>
+    <style>
+      .btn {
+        background-color: #00f;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="mvvm-app">
+      <input type="text" v-model="someStr" />
+      <input type="text" v-model="child.someStr" />
+      <p v-class="className" class="abc">
+        <span v-text="child.someStr"></span>
+        <ul>
+          <li>{{someStr}}</li>
+          <li>{{someStr}}</li>
+          <li>{{someStr}}</li>
+          <li>{{someStr}}</li>
+        </ul>
+      </p>
+      <p v-html="htmlStr"></p>
+      <button v-on:click="clickBtn">change model</button>
+    </div>
+
+    <script type="module">
+      import MVVM from "./js/index.js";
+      const vm = new MVVM({
+        el: "#mvvm-app",
+        data: {
+          someStr: "hello ",
+          elseStr: 'world',
+          className: "btn",
+          htmlStr: '<span style="color: #f00;">red</span>',
+          child: { someStr: "World !" },
+        },
+        methods: {
+          clickBtn: function (e) {
+            var randomStrArr = ["childOne", "childTwo", "childThree"];
+            this.child.someStr = randomStrArr[parseInt(Math.random() * 3)];
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
