@@ -21,7 +21,6 @@ const compileUtil = {
       if (val === newValue) {
         return;
       }
-
       this._setVMVal(vm, exp, newValue);
       val = newValue;
     });
@@ -33,9 +32,7 @@ const compileUtil = {
 
   bind(node, vm, exp, dir) {
     const updaterFn = updater[dir + "Updater"];
-
     updaterFn && updaterFn(node, this._getVMVal(vm, exp));
-
     new Watcher(vm, exp, function (value, oldValue) {
       updaterFn && updaterFn(node, value, oldValue);
     });
@@ -45,7 +42,6 @@ const compileUtil = {
   eventHandler(node, vm, exp, dir) {
     const eventType = dir.split(":")[1],
       fn = vm.$options.methods && vm.$options.methods[exp];
-
     if (eventType && fn) {
       node.addEventListener(eventType, fn.bind(vm), false);
     }
@@ -73,12 +69,10 @@ const compileUtil = {
     });
   },
 };
-
 class Compile {
   constructor(el, vm) {
     this.$vm = vm;
     this.$el = utils.isElementNode(el) ? el : document.querySelector(el); // this.$el是真实的dom
-
     this.$fragment = this.node2Fragment(this.$el);
     this.init();
     this.$el.appendChild(this.$fragment);
@@ -96,6 +90,7 @@ class Compile {
   init() {
     this.compileElement(this.$fragment); // 这样写是方便递归
   }
+
   compileElement(el) {
     const childNodes = el.childNodes,
       reg = /\{\{(.*)\}\}/;
@@ -111,6 +106,7 @@ class Compile {
       }
     });
   }
+
   compile(node) {
     const nodeAttrs = node.attributes; // 获取元素的属性， 比如 class， v-xxx
     [...nodeAttrs].forEach(attr => {
@@ -118,7 +114,6 @@ class Compile {
       if (utils.isDirective(attrName)) {
         const exp = attr.value,
           dir = attrName.substring(2); // 获取v-xxx的xxx
-        debugger;
         if (utils.isEventDirective(dir)) {
           compileUtil.eventHandler(node, this.$vm, exp, dir);
         } else {
@@ -128,6 +123,7 @@ class Compile {
       }
     });
   }
+
   compileText(node, exp) {
     compileUtil.text(node, this.$vm, exp);
   }

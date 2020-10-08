@@ -38,7 +38,7 @@ class Watcher {
     const exps = exp.split(".");
     return obj => {
       for (let i = 0, len = exps.length; i < len; i++) {
-        // for循环取属性
+        // for循环获取属性
         if (!obj) return;
         obj = obj[exps[i]];
       }

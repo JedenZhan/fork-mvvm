@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const obj = {
+        a: 1,
+        b: 2,
+        c: 3,
+        d: {
+          e: {
+            f: 4,
+          },
+        },
+      };
+      const defineReactive = (data, key, val) => {
+        if (Array.isArray(val)) {
+          // 数组的处理
+        }
+        if (typeof val === "object") walk(val); // 递归处理
+        Object.defineProperty(data, key, {
+          configurable: true,
+          enumerable: true,
+          get() {
+            console.log("get value");
+            return val;
+          },
+          set(newV) {
+            if (val === newV) return;
+            console.log("set value");
+            val = newV;
+          },
+        });
+      };
+
+      const walk = data => {
+        Object.keys(data).forEach(key => {
+          defineReactive(data, key, data[key]);
+        });
+      };
+
+      walk(obj);
+    </script>
+  </body>
+</html>
