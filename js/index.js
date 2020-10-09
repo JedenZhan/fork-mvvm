@@ -9,7 +9,7 @@ class MVVM {
       this.proxyData(data, key); // 让obj.a 可访问 obj.data.a
     });
 
-    observe(data, this); // 监听数据
+    observe(data, this); // 先监听数据
     this.$compile = new Compile(options.el || document.body, this); // 传入根元素，编译
   }
 
