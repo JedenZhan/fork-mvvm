@@ -11,9 +11,9 @@
 ```js
 ├── js
 │   ├── compile.js // 编译
-│   ├── dep.js // 依赖数组，包括新增依赖，更新函数
-│   ├── index.js // MVVM类所在
-│   ├── observer.js // 监听数据，收集依赖和触发更新
+│   ├── dep.js // 依赖数组，包括新增依赖, 通知更新函数
+│   ├── index.js // MVVM类所在, 代理数据
+│   ├── observer.js // 监听数据, 收集依赖和触发set
 │   ├── utils
 │   │   ├── updater.js // 更新数据工具
 │   │   └── utils.js // 判断元素类型工具
@@ -102,12 +102,12 @@ dep 的更新数组, 里面就是一个个的 watcher
 
 mvvm 的步骤
 
-1. 拿到 option 后, 取出 data 属性, 使用 proxyData 让每一个数据可以通过 this.xxx 访问
+1. 拿到 option 后, 取出 data 属性, 使用 proxyData`index.js/9` 让每一个数据可以通过 this.xxx 访问
 
 2. 接下来进行 data 数据的监听, 使用 observer 为每一个 key 添加监听, 监听获取和赋值, 并且实例化 dep, 每一个 key 都有闭包保存一个 dep
 
-3. 在 compile.js 里面可以看到 new Watcher 的时候参数(expOrFn 为 xxx 即访问数据的路径, 比如 a.b.c, cb 就是对应的更新函数, 都在 utils/updater.js 里面定义, v-html 和 v-text 等的更新函数都不同), 在 watcher 里面, 执行了 get 方法获取数据, get 方法先把本身赋值给 Dep 这个全局上面, 然后获取数据, 记住, 这时候的 data 是被监听的, watcher 获取的时候就会触发 get 函数, 然后执行 dep.depend, 这个 watcher 实例就会被加到这个属性对应的 dep 依赖数组 subs 里面. 就这样编译好对应的 html, 也收集好了依赖
+3. 在 compile.js 里面可以看到 new Watcher 的时候参数(expOrFn 为 xxx 即访问数据的路径, 比如 ‘a.b.c’, cb 就是对应的更新函数, 在 utils/updater.js 里面定义, v-html 和 v-text 等的更新函数都不同). 在实例化 watcher 的时候, 执行了 get 方法获取数据`watcher.js/29`, get 方法先把 watcher 实例本身赋值给 Dep 这个全局上面, 然后获取数据, 注意, **这时候的 data 是被监听的, watcher 获取的时候就会触发 get 函数, 然后执行 dep.depend`observer.js/20`, 这个 watcher 实例就会被加到这个属性对应的 dep 依赖数组 subs 里面**. 重复这个步骤编译好对应的 html, 收集好依赖
 
-4. 我们通过 this.xxx = 123 设置数据的时候, 触发 set 函数, 进而触发里面的 dep.notify 方法, 将这个属性对应的 dep.subs 也就是里面所有的 watcher 执行 update 函数, update 函数就是操作 DOM 的函数, 完成更新
+4. 我们通过 this.xxx = 123 设置数据的时候, 触发 set 函数, 进而触发 set 里面的 dep.notify 方法, 将这个属性对应的 dep.subs 也就是里面所有的 watcher 执行 update 函数, update 函数就是操作 DOM 的函数, 完成更新
 
-5. 数据的双向绑定, 本质就是监听了 input 的 onchange 方法, 对属性进行赋值, 然后触发 set 操作, 同第 4 步
+5. 数据的双向绑定, 本质就是监听了 input 的 onchange`compile.js/15` 方法, 对属性进行赋值, 然后触发 set 操作, 同第 4 步
